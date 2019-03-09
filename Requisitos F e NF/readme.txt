@@ -1,0 +1,1 @@
+arquivos para requisitos funcionais e nao funcionais
