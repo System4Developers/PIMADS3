@@ -46,24 +46,33 @@ namespace s4d_biomedicina.Apresentacao
         private void btnEditar_Click(object sender, EventArgs e)
         {
             this.comando = "editar";
-            this.idAgendamento = Convert.ToInt32(dgvPacientesAgendamentos.CurrentRow.Cells[0].Value);
+            try
+            {
+                this.idAgendamento = Convert.ToInt32(dgvPacientesAgendamentos.CurrentRow.Cells[0].Value);
 
-            frmPacientesAgendamentosManter frmPacientesAgendamentosManter = new frmPacientesAgendamentosManter(this.comando,this.idPaciente, this.idAgendamento);
-            frmPacientesAgendamentosManter.ShowDialog();
-            AtualizarTabela();
+                frmPacientesAgendamentosManter frmPacientesAgendamentosManter = new frmPacientesAgendamentosManter(this.comando, this.idPaciente, this.idAgendamento);
+                frmPacientesAgendamentosManter.ShowDialog();
+                AtualizarTabela();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Selecione um item da Tabela");
+            }
         }
 
-        private void btnNovoExame_Click(object sender, EventArgs e)
+        private void btnConsultarExames_Click(object sender, EventArgs e)
         {
-            int idConsulta;
-            this.comando = "inserir";
-            idConsulta = Convert.ToInt32(dgvPacientesAgendamentos.CurrentRow.Cells[0].Value);
-
-            frmPacientesExamesManter frmPacientesExamesManter = new frmPacientesExamesManter(this.comando, idPaciente, idConsulta);
-            frmPacientesExamesManter.ShowDialog();
-            AtualizarTabela();
+            try
+            {
+                this.idAgendamento = Convert.ToInt32(dgvPacientesAgendamentos.CurrentRow.Cells[0].Value);
+                frmPacientesExames frmPacientesExames = new frmPacientesExames(this.idPaciente, this.idAgendamento);
+                frmPacientesExames.ShowDialog();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Selecione um item da Tabela");
+            }
         }
-
     }
     
 }
