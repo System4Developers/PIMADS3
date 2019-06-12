@@ -7,33 +7,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace s4d_biomedicina.Apresentacao
 {
     public partial class frmPacientesManter : Form
     {
-        private readonly frmPacientes frmPacientes;
+        
         private string comando;
         private int idPaciente;
 
-        public frmPacientesManter(frmPacientes frm, string comando, int idPaciente)
+        public frmPacientesManter(string comando, int idPaciente)
         {
             InitializeComponent();
             this.comando = comando;
             this.idPaciente = idPaciente;
-            this.frmPacientes = frm;
         }
-
+        
         private void btnSalvar_Click(object sender, EventArgs e)
         {
-            Modelo.Controle controle = new Modelo.Controle();
-            if (this.comando.Equals("inserir"))
+            if (this.comando.Equals("editar"))
             {
-                controle.cadastrarPaciente(txbNome.Text, txbRg.Text, txbCpf.Text, txbDtNascimento.Text, txbProfissao.Text, txbGrauInstrucao.Text, txbProntuario.Text, Convert.ToDouble(txbPeso.Text), Convert.ToDouble(txbAltura.Text), txbGrupoSanguineo.Text, cmbEstado.Text,txbLogradouro.Text,txbBairro.Text,txbNumero.Text,txbCidade.Text,txbEstado.Text);
+                Modelo.Controle controle = new Modelo.Controle();
+                controle.AtualizarPaciente(txbNome.Text, txbRg.Text, txbCpf.Text, txbDtNascimento.Text, txbProfissao.Text, txbGrauInstrucao.Text, txbProntuario.Text, Convert.ToDouble(txbPeso.Text), Convert.ToDouble(txbAltura.Text), txbGrupoSanguineo.Text, cmbEstado.Text, Convert.ToInt32(txbID.Text));
                 if (controle.ToString().Equals(""))
                 {
-                    MessageBox.Show("Cadastro OK");
-                    this.frmPacientes.AtualizarTabela();
+                    MessageBox.Show("Atualizado com Sucesso!");
                     this.Close();
                 }
                 else
@@ -41,19 +40,20 @@ namespace s4d_biomedicina.Apresentacao
                     MessageBox.Show(controle.ToString());
                 }
             }
-
-            if (this.comando.Equals("editar"))
+            else
             {
-                controle.AtualizarPaciente(txbNome.Text,txbRg.Text,txbCpf.Text,txbDtNascimento.Text,txbProfissao.Text,txbGrauInstrucao.Text,txbProntuario.Text,Convert.ToDouble(txbPeso.Text), Convert.ToDouble(txbAltura.Text),txbGrupoSanguineo.Text,cmbEstado.Text,txbLogradouro.Text,txbBairro.Text,txbNumero.Text,txbCidade.Text,txbEstado.Text,Convert.ToInt32(txbID.Text));
+                Modelo.Controle controle = new Modelo.Controle();
+                controle.AdicionarPaciente(txbNome.Text, txbRg.Text, txbCpf.Text, txbDtNascimento.Text, txbProfissao.Text, txbGrauInstrucao.Text, txbProntuario.Text, Convert.ToDouble(txbPeso.Text), Convert.ToDouble(txbAltura.Text), txbGrupoSanguineo.Text, cmbEstado.Text);
                 if (controle.ToString().Equals(""))
                 {
-                    MessageBox.Show("Atualizado com Sucesso!");
-                    this.frmPacientes.AtualizarTabela();
+                    controle.GetPacienteID(txbCpf.Text);
+                    while (controle.Dr.Read())
+                    {
+                        this.idPaciente = Convert.ToInt32(controle.Dr["idPaciente"].ToString());
+                    }
+                    frmPacientesMain frmPacientesMain = new frmPacientesMain(this.comando, this.idPaciente);
+                    frmPacientesMain.ShowDialog();
                     this.Close();
-                }
-                else
-                {
-                    MessageBox.Show(controle.ToString());
                 }
             }
         }
@@ -62,31 +62,33 @@ namespace s4d_biomedicina.Apresentacao
         {
             if (this.comando.Equals("editar"))
             {
-                DAL.dalPaciente dalPaciente = new DAL.dalPaciente();
-                dalPaciente.GetEditarPaciente(this.idPaciente);
-                while (dalPaciente.dr.Read())
+                Modelo.Controle controle = new Modelo.Controle();
+                controle.GetPacienteDadosCadastrais(this.idPaciente);
+                while (controle.Dr.Read())
                 {
-                    
                     txbID.Text = this.idPaciente.ToString();
-                    txbProntuario.Text = dalPaciente.dr.GetValue(0).ToString();
-                    txbNome.Text = dalPaciente.dr.GetValue(1).ToString();
-                    txbRg.Text = dalPaciente.dr.GetValue(2).ToString();
-                    txbCpf.Text = dalPaciente.dr.GetValue(3).ToString();
-                    txbDtNascimento.Text = dalPaciente.dr.GetValue(4).ToString();
-                    txbGrauInstrucao.Text = dalPaciente.dr.GetValue(5).ToString();
-                    txbProfissao.Text = dalPaciente.dr.GetValue(6).ToString();
-                    cmbEstado.Text = dalPaciente.dr.GetValue(7).ToString();
-                    txbCidade.Text = dalPaciente.dr.GetValue(8).ToString();
-                    txbEstado.Text = dalPaciente.dr.GetValue(9).ToString();
-                    txbLogradouro.Text = dalPaciente.dr.GetValue(10).ToString();
-                    txbBairro.Text = dalPaciente.dr.GetValue(11).ToString();
-                    txbNumero.Text = dalPaciente.dr.GetValue(12).ToString();
-                    txbPeso.Text = dalPaciente.dr.GetValue(13).ToString();
-                    txbAltura.Text = dalPaciente.dr.GetValue(14).ToString();
-                    txbGrupoSanguineo.Text = dalPaciente.dr.GetValue(15).ToString();
-                  
+                    txbProntuario.Text = controle.Dr["prontuario"].ToString();
+                    txbPeso.Text = controle.Dr["peso"].ToString();
+                    txbAltura.Text = controle.Dr["altura"].ToString();
+                    txbGrupoSanguineo.Text = controle.Dr["grupoSanguineo"].ToString();
+                    cmbEstado.Text = controle.Dr["estadoPaciente"].ToString();
+                    txbNome.Text = controle.Dr["nome"].ToString();
+                    txbRg.Text = controle.Dr["rg"].ToString();
+                    txbCpf.Text = controle.Dr["cpf"].ToString();
+                    txbDtNascimento.Text = controle.Dr["dtNascimento"].ToString();
+                    txbProfissao.Text = controle.Dr["profissao"].ToString();
+                    txbGrauInstrucao.Text = controle.Dr["grauInstrucao"].ToString();
                 }
             }
+            else
+            {
+                cmbEstado.SelectedIndex = 0;
+            }
+        }
+
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

@@ -13,17 +13,14 @@ namespace s4d_biomedicina.Apresentacao
     public partial class frmExamesTiposManter : Form
     {
 
-        private readonly frmExamesTipos frmExamesTipos;
         private string comando;
         private int idExameTipo;
 
-        public frmExamesTiposManter(frmExamesTipos frm, string comando, int idExameTipo)
+        public frmExamesTiposManter(string comando, int idExameTipo)
         {
             InitializeComponent();
-            
             this.comando = comando;
             this.idExameTipo = idExameTipo;
-            this.frmExamesTipos = frm;
         }
 
         private void frmExamesTiposManter_Load(object sender, EventArgs e)
@@ -35,16 +32,20 @@ namespace s4d_biomedicina.Apresentacao
 
             if (this.comando.Equals("editar"))
              {
-                 DAL.dalExameTipo dalExameTipo = new DAL.dalExameTipo();
-                 dalExameTipo.GetEditarExamesTipos(this.idExameTipo);
-                 while (dalExameTipo.dr.Read())
+                controle.GetEditarExameTipo(this.idExameTipo);
+                 while (controle.Dr.Read())
                  {
                      txbID.Text = this.idExameTipo.ToString();
-                     cmbDsArea.Text = dalExameTipo.dr["dsExameArea"].ToString();
-                     cmbStatus.Text = dalExameTipo.dr["estadoExameTipo"].ToString();
-                     txbTipo.Text = dalExameTipo.dr["dsExameTipo"].ToString();
+                     cmbDsArea.Text = controle.Dr["dsExameArea"].ToString();
+                     cmbStatus.Text = controle.Dr["estadoExameTipo"].ToString();
+                     txbTipo.Text = controle.Dr["dsExameTipo"].ToString();
                  }
-             }
+            }
+            else
+            {
+                this.cmbStatus.SelectedIndex = 0;
+            }
+            
         }
 
         private void btnSalvar_Click(object sender, EventArgs e)
@@ -55,15 +56,13 @@ namespace s4d_biomedicina.Apresentacao
                controle.cadastrarExameTipo(txbTipo.Text, cmbStatus.Text, Convert.ToInt32(cmbDsArea.SelectedValue.ToString()));
                 if (controle.ToString().Equals(""))
                 {
-                    MessageBox.Show("Cadastro OK");
-                    this.frmExamesTipos.AtualizarTabela();
+                    MessageBox.Show("Cadastrado com Sucesso!");
                     this.Close();
                 }
                 else
                 {
                     MessageBox.Show(controle.ToString());
                 }
-                
             }
 
             if (this.comando.Equals("editar"))
@@ -72,7 +71,6 @@ namespace s4d_biomedicina.Apresentacao
                 if (controle.ToString().Equals(""))
                 {
                     MessageBox.Show("Atualizado com Sucesso!");
-                    this.frmExamesTipos.AtualizarTabela();
                     this.Close();
                 }
                 else
@@ -82,5 +80,9 @@ namespace s4d_biomedicina.Apresentacao
             }
         }
 
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

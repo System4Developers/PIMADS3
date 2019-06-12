@@ -31,6 +31,27 @@ namespace s4d_biomedicina.DAL
             return dt;
         }
 
+        public void GetListaExamesDisponiveis(int idExameArea)
+        {
+            SqlCommand cmd = new SqlCommand();
+            Conexao con = new Conexao();
+
+            this.idExameArea = idExameArea;
+
+            cmd.CommandText = "select idExameTipo as [ID],dsExameTipo as [Tipo] from examesTipos where fk_idExameArea_examesAreas = @idExameArea";
+            cmd.Parameters.AddWithValue("@idExameArea",this.idExameArea);
+            try
+            {
+                cmd.Connection = con.Conectar();
+                dr = cmd.ExecuteReader();
+            }
+            catch (Exception)
+            {
+                this.mensagem = "Erro com Banco";
+            }
+        
+        }
+
         public string AdicionarExameTipo(string dsExameTipo, string estadoExameTipo, int idExameArea)
         {
             SqlCommand cmd = new SqlCommand();
